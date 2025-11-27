@@ -18,3 +18,4 @@ const inventorySchema = new mongoose.Schema({
 inventorySchema.index({ room: 1, date: 1 }, { unique: true });
 
 module.exports = mongoose.model('Inventory', inventorySchema);
+

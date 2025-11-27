@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('./User');
 
 // JWT 토큰 검증 미들웨어
-const authenticate = async (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   try {
     // 헤더에서 토큰 추출
     const token = req.headers.authorization?.split(' ')[1]; // Bearer 토큰 형식
@@ -58,5 +58,35 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-module.exports = { authenticate };
+// 역할 기반 접근 제어 미들웨어
+const authorize = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: '인증이 필요합니다.'
+      });
+    }
+
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: '접근 권한이 없습니다.'
+      });
+    }
+
+    next();
+  };
+};
+
+// 하위 호환성을 위한 별칭
+const authenticate = verifyToken;
+const checkRole = authorize;
+
+module.exports = {
+  verifyToken,
+  authorize,
+  authenticate, // 하위 호환성
+  checkRole // 하위 호환성
+};
 
