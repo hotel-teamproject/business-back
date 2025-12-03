@@ -4,7 +4,13 @@ exports.getMyHotels = async (req, res) => {
   try {
     const userId = req.user._id;
     const hotels = await Hotel.find({ ownerId: userId }).sort({ createdAt: -1 });
-    res.json({ success: true, data: hotels });
+    // 프런트 BusinessHotelListPage 에서 data.hotels 로 사용
+    res.json({
+      hotels,
+      totalPages: 1,
+      currentPage: 1,
+      total: hotels.length,
+    });
   } catch (error) {
     res.status(500).json({ message: '호텔 목록 조회 실패', error });
   }
@@ -20,7 +26,8 @@ exports.getHotelById = async (req, res) => {
       return res.status(404).json({ message: '호텔을 찾을 수 없습니다.' });
     }
     
-    res.json({ success: true, data: hotel });
+    // 프런트 BusinessHotelEditPage 에서 호텔 객체를 그대로 사용
+    res.json(hotel);
   } catch (error) {
     res.status(500).json({ message: '호텔 조회 실패', error });
   }

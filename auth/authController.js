@@ -17,7 +17,7 @@ const sanitizeUser = (user) => {
   return obj;
 };
 
-// POST /admin/auth/login
+// POST /admin/auth/login, POST /business/auth/login
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -63,13 +63,23 @@ exports.login = async (req, res) => {
     }
 
     const token = generateToken(user);
+    const sanitized = sanitizeUser(user);
 
-    return res.json({
-      success: true,
-      data: {
+    // 프런트엔드 business-front의 기대 응답 형태에 맞춤
+    // - 사업자 로그인: { token, user }
+    // - 관리자 로그인: { token, admin, user } (adminAuthApi에서 admin 필드를 사용)
+    if (user.role === 'admin') {
+      return res.json({
         token,
-        user: sanitizeUser(user),
-      },
+        admin: sanitized,
+        user: sanitized,
+      });
+    }
+
+    // 기본(사업자) 응답
+    return res.json({
+      token,
+      user: sanitized,
     });
   } catch (error) {
     console.error('login error:', error);
@@ -90,7 +100,7 @@ exports.logout = async (req, res) => {
   });
 };
 
-// GET /admin/auth/me
+// GET /admin/auth/me, GET /business/auth/me
 exports.getMyInfo = async (req, res) => {
   try {
     // verifyToken 에서 req.user 설정
@@ -101,10 +111,8 @@ exports.getMyInfo = async (req, res) => {
       });
     }
 
-    return res.json({
-      success: true,
-      data: sanitizeUser(req.user),
-    });
+    // 프런트에서는 순수 유저 객체를 기대하므로 래핑 없이 그대로 반환
+    return res.json(sanitizeUser(req.user));
   } catch (error) {
     return res.status(500).json({
       success: false,
