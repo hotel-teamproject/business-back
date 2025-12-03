@@ -18,7 +18,8 @@ const adminStatsRoutes = require('./adminStats/adminStatsRoutes');
 const adminUserRoutes = require('./users/userAdminRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+// 프런트엔드 기본 설정(baseURL: http://localhost:8080/api)에 맞춰 기본 포트를 8080으로 설정
+const PORT = process.env.PORT || 8080;
 
 // 미들웨어
 app.use(cors());
@@ -39,7 +40,9 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/business-
   });
 
 // 기능별 라우트 등록
+// 관리자/사업자 공통 인증 라우트
 app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/business/auth', adminAuthRoutes);
 app.use('/api/admin/hotels', adminHotelRoutes);
 app.use('/api/admin/bookings', adminBookingRoutes);
 app.use('/api/admin/reviews', adminReviewRoutes);
@@ -47,7 +50,7 @@ app.use('/api/admin/stats', adminStatsRoutes);
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/business/dashboard', dashboardRoutes);
 app.use('/api/business/hotels', hotelRoutes);
-app.use('/api/business/rooms', roomRoutes);
+app.use('/api/business', roomRoutes); // /api/business/hotels/:hotelId/rooms, /api/business/rooms/:roomId
 app.use('/api/business', inventoryRoutes); // /api/business/rooms/:roomId/inventory, /api/business/rooms/:roomId/pricing
 app.use('/api/business/reservations', bookingRoutes);
 app.use('/api/business/settlements', settlementRoutes);

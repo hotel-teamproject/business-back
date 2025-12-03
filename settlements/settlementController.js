@@ -14,12 +14,10 @@ exports.getSettlements = async (req, res) => {
     
     const totalAmount = settlements.reduce((sum, s) => sum + s.finalAmount, 0);
     
+    // 프런트 BusinessSettlementPage 에서 data.settlements 로 사용
     res.json({
-      success: true,
-      data: {
-        settlements,
-        totalAmount
-      }
+      settlements,
+      totalAmount,
     });
   } catch (error) {
     res.status(500).json({ message: '정산 내역 조회 실패', error });

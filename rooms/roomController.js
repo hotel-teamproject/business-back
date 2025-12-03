@@ -13,7 +13,8 @@ exports.getRoomsByHotel = async (req, res) => {
     }
     
     const rooms = await Room.find({ hotelId }).sort({ createdAt: -1 });
-    res.json({ success: true, data: rooms });
+    // 프런트 BusinessRoomManagePage 에서 data.rooms 로 사용
+    res.json({ rooms });
   } catch (error) {
     res.status(500).json({ message: '객실 목록 조회 실패', error });
   }
@@ -35,7 +36,8 @@ exports.getRoomById = async (req, res) => {
       return res.status(403).json({ message: '접근 권한이 없습니다.' });
     }
     
-    res.json({ success: true, data: room });
+    // 프런트 BusinessRoomEditPage 에서 객실 객체를 그대로 사용
+    res.json(room);
   } catch (error) {
     res.status(500).json({ message: '객실 조회 실패', error });
   }

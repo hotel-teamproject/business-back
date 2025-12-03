@@ -27,7 +27,8 @@ exports.getInventory = async (req, res) => {
     }
     
     const inventories = await Inventory.find(query).sort({ date: 1 });
-    res.json({ success: true, data: inventories });
+    // 프런트 BusinessInventoryPage는 { inventory: [...] } 형태를 기대
+    res.json({ inventory: inventories });
   } catch (error) {
     res.status(500).json({ message: '재고 조회 실패', error });
   }
@@ -35,8 +36,8 @@ exports.getInventory = async (req, res) => {
 
 exports.updateInventory = async (req, res) => {
   try {
-    const { roomId } = req.params;
-    const { date, totalRooms, availableRooms, priceOverride, status } = req.body;
+    const { roomId, date: dateParam } = req.params;
+    const { date: dateBody, totalRooms, availableRooms, priceOverride, status } = req.body;
     const userId = req.user._id;
     
     // 객실 소유권 확인
@@ -61,8 +62,11 @@ exports.updateInventory = async (req, res) => {
       updateData.priceOverride = priceOverride;
     }
     
+    // 경로 파라미터 우선, 없으면 바디의 date 사용
+    const targetDate = dateParam || dateBody;
+
     const inventory = await Inventory.findOneAndUpdate(
-      { room: roomId, date: new Date(date) },
+      { room: roomId, date: new Date(targetDate) },
       updateData,
       { new: true, upsert: true }
     );

@@ -14,7 +14,8 @@ exports.getMyReservations = async (req, res) => {
       .populate('roomId', 'name type')
       .sort({ createdAt: -1 });
     
-    res.json({ success: true, data: bookings });
+    // 프런트 BusinessReservationListPage 에서 data.reservations 로 사용
+    res.json({ reservations: bookings });
   } catch (error) {
     res.status(500).json({ message: '예약 목록 조회 실패', error });
   }
@@ -39,7 +40,8 @@ exports.getReservationById = async (req, res) => {
       return res.status(403).json({ message: '접근 권한이 없습니다.' });
     }
     
-    res.json({ success: true, data: booking });
+    // 프런트 BusinessReservationDetailPage 에서 예약 객체를 그대로 사용
+    res.json(booking);
   } catch (error) {
     res.status(500).json({ message: '예약 조회 실패', error });
   }
